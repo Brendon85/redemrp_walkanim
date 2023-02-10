@@ -50,7 +50,7 @@ function OpenWalkMenu()
         { label = _U("Refined"), value = "A9", desc = _U("chooseAnim"), info = "MP_Style_Refined" },
         { label = _U("SilentType"), value = "A10", desc = _U("chooseAnim"), info = "MP_Style_SilentType" },
         { label = _U("Veteran"), value = "A11", desc = _U("chooseAnim"), info = "MP_Style_Veteran" },
-        { label = _U("RemoveWalk"), value = "removeA", desc = _U("removedesc"), info = "noanim" },
+        { label = _U("RemoveWalk"), value = "removeA", desc = _U("removedesc"), info = "MP_Style_Casual" },
     }
 
     MenuData.Open('default', GetCurrentResourceName(), 'menuapi', {
@@ -87,7 +87,7 @@ RegisterNetEvent("redemrp_walkanim:getwalk2")
 AddEventHandler("redemrp_walkanim:getwalk2", function(walk)
     local animation = walk
     local player = PlayerPedId()
-    if animation == "noanim" then
+    if animation == "MP_Style_Casual" then
         Citizen.InvokeNative(0xCB9401F918CB0F75, player, animation, 0, -1)
         Wait(500)
         TriggerServerEvent("redemrp_walkanim:setwalk", animation)
@@ -95,19 +95,25 @@ AddEventHandler("redemrp_walkanim:getwalk2", function(walk)
         Citizen.InvokeNative(0xCB9401F918CB0F75, player, animation, 1, -1)
     end
 
+end)
+
+AddEventHandler('playerSpawned', function()
+    Wait(3000)
+    local PlayerData = RedEM.GetPlayerData()
+    print(PlayerData.metadata.walk)
+    TriggerEvent('redemrp_walkanim:setAnim', PlayerData.metadata.walk)
 end)
 
 AddEventHandler("redemrp_walkanim:setAnim", function(animation)
     local player = PlayerPedId()
 
-    if animation == "noanim" then
+    if animation == "MP_Style_Casual" then
         Citizen.InvokeNative(0xCB9401F918CB0F75, player, animation, 0, -1)
         Wait(500)
         TriggerServerEvent("redemrp_walkanim:setwalk", animation)
         Wait(500)
         ExecuteCommand("rc")
     else
-
         Citizen.InvokeNative(0xCB9401F918CB0F75, player, animation, 0, -1)
         Wait(500)
         Citizen.InvokeNative(0xCB9401F918CB0F75, player, animation, 1, -1)
@@ -116,13 +122,6 @@ AddEventHandler("redemrp_walkanim:setAnim", function(animation)
         ExecuteCommand("rc")
     end
 
-end)
-
-AddEventHandler("onResourceStart", function(resourceName)
-    if resourceName == GetCurrentResourceName() then
-        Wait(10000)
-        TriggerServerEvent("redemrp_walkanim:getwalk")
-    end
 end)
 
 RegisterCommand("walkstyle", function(source, args, rawCommand)
